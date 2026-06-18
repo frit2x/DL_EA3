@@ -168,5 +168,17 @@ function updateChart(topPredictions) {
     });
 }
 
-// Initialisierung starten
-window.onload = init;
+// Sicherer Start der Anwendung erst, wenn das Fenster und alle Skripte bereit sind
+window.addEventListener('DOMContentLoaded', () => {
+    // Kurze Verzögerung, um sicherzustellen, dass 'tf' global registriert ist
+    setTimeout(() => {
+        if (typeof tf !== 'undefined') {
+            init();
+        } else {
+            const status = document.getElementById("statusMessage");
+            status.textContent = "Fehler: TensorFlow.js konnte nicht geladen werden. Bitte Seite neu laden.";
+            status.className = "text-sm mt-1 text-red-600 font-medium";
+        }
+    }, 500);
+});
+
