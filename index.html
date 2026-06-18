@@ -5,15 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LSTM Wortvorhersage mit TensorFlow.js</title>
     
-    <!-- Tailwind CSS (Neueste Version via cdnjs/unpkg) -->
+    <!-- KORREKTUR 1: Offizielles Tailwind Play-CDN (verhindert den Content-Type Fehler komplett) -->
+    <script src="https://jsdelivr.net"></script>
+    
+    <!-- KORREKTUR 2: Absolut stabiler, direkter Pfad zu TensorFlow.js -->
     <script src="https://unpkg.com"></script>
     
-    <!-- TensorFlow.js (Expliziter Pfad zur minimierten JS-Datei verhindert den MIME-Typ-Fehler) -->
-    <script src="https://unpkg.com"></script>
-    
-    <!-- Chart.js (Expliziter Pfad zur UMD-Datei) -->
+    <!-- KORREKTUR 3: Direkter Pfad zu Chart.js -->
     <script src="https://unpkg.com"></script>
 </head>
+
 
 
 <body class="bg-gray-50 text-gray-800 font-sans p-6">
