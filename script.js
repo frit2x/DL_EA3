@@ -4,24 +4,30 @@ let autoInterval = null;
 const SEQUENCE_LENGTH = 3;
 
 // 1. Modell und Daten asynchron beim Start laden
+// Ermittelt den aktuellen Pfad der Webseite (wichtig für GitHub Pages Unterordner)
+const BASE_URL = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/';
+
 async function init() {
     const status = document.getElementById("statusMessage");
     try {
         status.textContent = "Lade Vokabular...";
-        wordToIdx = await fetch('./word_to_idx.json').then(res => res.json());
-        idxToWord = await fetch('./idx_to_word.json').then(res => res.json());
+        // Nutzt den dynamischen Basis-Pfad
+        wordToIdx = await fetch(BASE_URL + 'word_to_idx.json').then(res => res.json());
+        idxToWord = await fetch(BASE_URL + 'idx_to_word.json').then(res => res.json());
         
         status.textContent = "Lade neuronales Netz (TFJS)...";
-        model = await tf.loadLayersModel('./tfjs_model/model.json');
+        // Wichtig: Der Pfad zur model.json muss exakt stimmen
+        model = await tf.loadLayersModel(BASE_URL + 'tfjs_model/model.json');
         
         status.textContent = "Bereit für Eingaben.";
         status.className = "text-sm mt-1 text-green-600 font-medium";
     } catch (error) {
-        status.textContent = "Fehler beim Laden der Dateien! (Prüfen Sie Live Server / CORS)";
+        status.textContent = "Fehler beim Laden der Dateien! Überprüfe die Pfade im Repository.";
         status.className = "text-sm mt-1 text-red-600 font-medium";
         console.error(error);
     }
 }
+
 
 // 2. Mathematische Wortvorhersage via TFJS
 async function predictNextWords() {
