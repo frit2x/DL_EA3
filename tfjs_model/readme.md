@@ -1,1 +1,0 @@
-"batch_shape": [null, 3] ersetzen mit: batch_input_shape
