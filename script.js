@@ -168,21 +168,15 @@ function updateChart(topPredictions) {
     });
 }
 
+// Startet die Anwendung sofort, wenn das Fenster komplett geladen wurde
 window.addEventListener('load', () => {
     const status = document.getElementById("statusMessage");
     
-    // Prüfe alle 300 Millisekunden, ob 'tf' bereitsteht (max. 10 Versuche)
-    let attempts = 0;
-    const checkTF = setInterval(() => {
-        attempts++;
-        if (typeof tf !== 'undefined') {
-            clearInterval(checkTF);
-            init(); // Starte das Laden des Modells
-        } else if (attempts >= 10) {
-            clearInterval(checkTF);
-            status.textContent = "Fehler: TensorFlow.js konnte nicht geladen werden. Prüfen Sie Ihre Internetverbindung.";
-            status.className = "text-sm mt-1 text-red-600 font-medium";
-        }
-    }, 300);
+    if (typeof tf !== 'undefined') {
+        console.log("TensorFlow.js erfolgreich erkannt! Starte Modell-Initialisierung...");
+        init(); // Startet das Laden Ihres Modells und der JSON-Dateien
+    } else {
+        status.textContent = "Fehler: TensorFlow.js ist nicht verfügbar. Bitte Seite neu laden.";
+        status.className = "text-sm mt-1 text-red-600 font-medium";
+    }
 });
-
