@@ -1,101 +1,108 @@
 <!DOCTYPE html>
+
 <html lang="de">
-<head>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSTM Wortvorhersage mit TensorFlow.js</title>
-    
-    <!-- 1. Tailwind CSS über das stabile cdnjs-Netzwerk -->
-    <link rel="stylesheet" href="https://cloudflare.com" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
-    <!-- 2. TensorFlow.js über das stabile cdnjs-Netzwerk -->
-    <script src="https://cloudflare.com" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <!-- 3. Chart.js (UMD-Variante für Browser) über cdnjs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+```
+<title>LSTM Wortvorhersage mit TensorFlow.js</title>
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+```
+
 </head>
-
-
-
-
-
 
 <body class="bg-gray-50 text-gray-800 font-sans p-6">
 
-    <!-- TEST-LABEL: Ändern Sie diese Version bei jedem Versuch (z. B. auf v1.1, v1.2) -->
-    <div class="bg-red-500 text-white text-center font-bold p-3 rounded mb-4">
-        🚀 AKTUELLER SEITEN-STAND: VERSION 5.0 (Geladen am Freitag)
+```
+<div class="bg-red-500 text-white text-center font-bold p-3 rounded mb-4">
+    🚀 AKTUELLER SEITEN-STAND: VERSION 5.1
+</div>
+
+<div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mb-8">
+
+    <h1 class="text-2xl font-bold mb-4 text-indigo-700">
+        🔮 Next Word Prediction (LSTM)
+    </h1>
+
+    <p class="text-sm text-gray-500 mb-4 bg-blue-50 p-3 rounded border border-blue-200">
+        <strong>Bedienungshilfe:</strong>
+        Geben Sie mindestens drei Wörter ein und klicken Sie auf
+        „Vorhersage“.
+    </p>
+
+    <textarea
+        id="promptInput"
+        rows="3"
+        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg"
+        placeholder="Geben Sie hier Ihren Text ein..."
+    ></textarea>
+
+    <div id="statusMessage" class="text-sm mt-1 text-gray-600 h-5">
+        Modell wird geladen...
     </div>
 
-    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mb-8">
-        <h1 class="text-2xl font-bold mb-4 text-indigo-700">🔮 Next Word Prediction (LSTM)</h1>
-        
-        <!-- Hilfetext / UX Kontextsensitive Hilfe -->
-        <p class="text-sm text-gray-500 mb-4 bg-blue-50 p-3 rounded border border-blue-200">
-            <strong>Bedienungshilfe:</strong> Geben Sie unten Text ein (mindestens 3 Wörter). Drücken Sie <em>Vorhersage</em>, um Vorschläge zu sehen. Nutzen Sie <em>Weiter</em> für das wahrscheinlichste Wort, <em>Auto</em> für eine Textgenerierung oder wählen Sie ein Wort direkt aus der Liste.
-        </p>
+    <div class="flex flex-wrap gap-2 mt-4">
+        <button id="btnPredict"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md">
+            Vorhersage
+        </button>
 
-        <!-- Texteingabe (Prompt) -->
-        <textarea id="promptInput" rows="3" class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg" placeholder="Geben Sie hier Ihren Text ein..."></textarea>
-        
-        <!-- Status- und Feedback-Meldungen -->
-        <div id="statusMessage" class="text-sm mt-1 text-gray-600 h-5">Modell wird geladen...</div>
+        <button id="btnNext"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+            Weiter
+        </button>
 
-        <!-- Buttons (Interaktionsanforderungen I1 - I4) -->
-        <div class="flex flex-wrap gap-2 mt-4">
-            <button id="btnPredict" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">Vorhersage</button>
-            <button id="btnNext" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">Weiter</button>
-            <button id="btnAuto" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">Auto (Max 10)</button>
-            <button id="btnStop" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">Stopp</button>
-            <button id="btnReset" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md font-medium transition shadow-sm">Reset</button>
-        </div>
+        <button id="btnAuto"
+            class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-md">
+            Auto (Max 10)
+        </button>
 
-        <!-- Wortauswahl-Liste (Anforderung I1) -->
-        <div class="mt-6">
-            <h3 class="text-md font-semibold mb-2 text-gray-700">Wortauswahl (Klicken zum Hinzufügen):</h3>
-            <div id="wordSuggestions" class="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-100 rounded-md">
-                <!-- Dynamische Buttons erscheinen hier -->
-            </div>
-        </div>
+        <button id="btnStop"
+            class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-md">
+            Stopp
+        </button>
 
-        <!-- Visualisierung (Chart.js Diagramm) -->
-        <div class="mt-6">
-            <h3 class="text-md font-semibold mb-2 text-gray-700">Wahrscheinlichkeitsverteilung:</h3>
-            <div class="h-64 bg-gray-50 p-2 rounded border border-gray-200">
-                <canvas id="predictionChart"></canvas>
-            </div>
-        </div>
+        <button id="btnReset"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md">
+            Reset
+        </button>
     </div>
 
-    <!-- ABGABE-BEREICHE (Diskussion & Dokumentation) -->
-    <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Diskussion (Ergebnisse & Learnings)</h2>
-        <p class="text-gray-700 leading-relaxed mb-6">
-            <!-- SCHREIBEN SIE HIER IHRE MAXIMAL 10 SÄTZE DISKUSSION HIN -->
-            In diesem Experiment wurde beobachtet, dass das LSTM-Modell kurze Wortfolgen aus den Trainingsdaten sehr präzise vorhersagen kann. Bei k=1 liegt die Treffersicherheit bei kleinen Datensätzen hoch, sinkt jedoch bei komplexeren Texten ohne erweitertes Training ab. Unter den Top k=5 oder k=10 Vorhersagen befindet sich das korrekte Wort signifikant häufiger. Ein niedriger Cross-Entropy Loss korreliert dabei spürbar mit einer flüssigeren autoregressiven Textgenerierung. Das Framework TensorFlow.js ermöglichte eine performante Ausführung dieser Vorhersagen in Echtzeit direkt im Browser.
-        </p>
+    <div class="mt-6">
+        <h3 class="text-md font-semibold mb-2">
+            Wortauswahl:
+        </h3>
 
-        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Technische Dokumentation</h2>
-        <div class="space-y-3 text-gray-700 mb-6">
-            <p><strong>Verwendete Frameworks:</strong></p>
-            <ul class="list-disc pl-5 space-y-1">
-                <li><strong>TensorFlow (Python):</strong> Verwendet zum rechenintensiven Trainieren des Stacked LSTM-Netzwerks auf Cloud-GPUs in Google Colab.</li>
-                <li><strong>TensorFlow.js (TFJS):</strong> Wird im Browser genutzt, um das konvertierte Modell clientseitig und ohne Server-Backend asynchron auszuführen.</li>
-                <li><strong>Chart.js:</strong> Dient zur interaktiven, visuellen Darstellung der Top-Wortwahrscheinlichkeiten in einem Balkendiagramm.</li>
-                <li><strong>Tailwind CSS:</strong> Ermöglicht ein schnelles, responsives Layout gemäß modernen UX/UI-Standards.</li>
-            </ul>
-            <p><strong>Technische Besonderheiten:</strong> Das Python-Modell musste via <code>tensorflowjs_converter</code> in ein Shard-basiertes Webformat übersetzt werden. Da der Web-Browser lokale JSON-Dateien aus Sicherheitsgründen sperrt, erfordert der Betrieb zwingend eine lokale Webserver-Umgebung (z.B. VS Code Live Server).</p>
-        </div>
-
-        <h2 class="text-xl font-bold mb-4 border-b pb-2 text-gray-800">Fachliche Dokumentation</h2>
-        <div class="space-y-3 text-gray-700">
-            <p><strong>Implementierung der Logik:</strong> Der eingegebene Text (Prompt) wird beim Klick tokenisiert. Die letzten drei Wörter werden über das geladene <code>word_to_idx</code>-Dictionary in numerische Indizes übersetzt. Das TFJS-Modell liefert nach dem Forward Pass einen Tensor mit Softmax-Wahrscheinlichkeiten für jedes Wort im Vokabular. Über ein JavaScript-Sortierungsverfahren extrahieren wir die Top-Treffer.</p>
-            <p><strong>Datenschutz-Diskussion (Rekonstruktion):</strong> Ja, die ursprünglichen Trainingsdaten lassen sich mittels des Modells teilweise rekonstruieren, wenn man bekannte Phrasen eingibt (Modell-Overfitting). Das stellt ein massives Datenschutzproblem dar, da neuronale Netze dazu neigen, sensible Informationen (wie Namen oder Passwörter) aus dem Trainingstext implizit zu speichern und über die autoregressive Generierung wieder preiszugeben.</p>
+        <div
+            id="wordSuggestions"
+            class="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-100 rounded-md"
+        >
         </div>
     </div>
 
-    <!-- Logik-Skript einbinden -->
-    <script src="script.js"></script>
+    <div class="mt-6">
+        <h3 class="text-md font-semibold mb-2">
+            Wahrscheinlichkeitsverteilung:
+        </h3>
+
+        <div class="h-64 bg-gray-50 p-2 rounded border border-gray-200">
+            <canvas id="predictionChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Script erst ganz am Ende laden -->
+<script src="script.js"></script>
+```
+
 </body>
 </html>
