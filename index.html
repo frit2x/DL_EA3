@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
 <title>LSTM Wortvorhersage mit TensorFlow.js</title>
 
 <!-- Tailwind CSS -->
@@ -16,18 +15,25 @@
 
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-```
+
 
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans p-6">
-
-```
-<div class="bg-red-500 text-white text-center font-bold p-3 rounded mb-4">
-    🚀 AKTUELLER SEITEN-STAND: VERSION 7
-</div>
-
 <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 mb-8">
+
+       <div class="mb-8 pb-6 border-b border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+                Einsendeaufgabe 3 – Deep Learning (DL)
+            </h2>
+            <p class="text-sm text-gray-600">
+                Matrikelnummer: 106531 |
+                E-Mail:
+                <a href="mailto:frhe8734@bht-berlin.de" class="text-indigo-600 hover:underline">
+                    frhe8734@bht-berlin.de
+                </a>
+            </p>
+        </div>
 
     <h1 class="text-2xl font-bold mb-4 text-indigo-700">
         🔮 Next Word Prediction (LSTM)
@@ -98,11 +104,213 @@
             <canvas id="predictionChart"></canvas>
         </div>
     </div>
+    <div class="mt-10 border-t border-gray-200 pt-8">
+    <div class="max-w-3xl mx-auto text-gray-700 leading-7">
+        <h2 class="text-2xl font-bold text-indigo-700 mb-6">
+            Dokumentation und Auswertung
+        </h2>
+<div class="mt-10 border-t border-gray-200 pt-8">
+    <div class="max-w-3xl mx-auto">
+   
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                1. Experimentieren mit der Netzwerkarchitektur
+            </h3>
+
+            <p class="mb-4">
+                Die vorgegebene Architektur wurde mit einer Embedding-Schicht
+                mit 50 Dimensionen, zwei LSTM-Schichten mit jeweils 100 Units
+                sowie einer Softmax-Ausgabeschicht umgesetzt. Die Eingabe
+                besteht aus drei aufeinanderfolgenden Wörtern, aus denen das
+                Modell das nächste Wort vorhersagt. Das finale Modell besitzt
+                insgesamt 14.333.579 Parameter und verwendet ein Vokabular von
+                30.709 Wörtern.
+            </p>
+
+            <p>
+                Neben der Architektur wurde insbesondere mit unterschiedlichen
+                Trainingsdaten experimentiert. Zunächst wurde ein einzelnes
+                Fachbuch verwendet. Dadurch lernte das Modell die typischen
+                Formulierungen dieses Textes sehr gut, die Vorhersagen waren
+                jedoch stark themenspezifisch. Anschließend wurden
+                Literaturtexte und Wikipedia-Artikel kombiniert. Dadurch wurde
+                das Vokabular deutlich größer und die erzeugten Vorhersagen
+                wurden allgemeiner und vielfältiger. Die finale Lösung basiert
+                daher auf dem kombinierten Datensatz.
+            </p>
+        </section>
+
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                2. Resultate der Wortvorhersage
+            </h3>
+
+            <p class="mb-4">
+                Zur Bewertung der Vorhersagequalität wurden Top-k-Metriken
+                verwendet. Dabei wird geprüft, ob das korrekte nächste Wort
+                unter den k wahrscheinlichsten Vorhersagen des Modells
+                enthalten ist.
+            </p>
+
+            <div class="overflow-x-auto mb-4">
+                <table class="w-full text-left border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-100 text-gray-800">
+                        <tr>
+                            <th class="px-4 py-3 font-semibold border-b border-gray-200">Metrik</th>
+                            <th class="px-4 py-3 font-semibold border-b border-gray-200">Ergebnis</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 py-3">Top-1 Accuracy</td>
+                            <td class="px-4 py-3">34,93 %</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 py-3">Top-5 Accuracy</td>
+                            <td class="px-4 py-3">44,27 %</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 py-3">Top-10 Accuracy</td>
+                            <td class="px-4 py-3">48,68 %</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 py-3">Top-20 Accuracy</td>
+                            <td class="px-4 py-3">53,51 %</td>
+                        </tr>
+                        <tr class="border-b border-gray-100">
+                            <td class="px-4 py-3">Top-100 Accuracy</td>
+                            <td class="px-4 py-3">65,83 %</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3">Perplexity</td>
+                            <td class="px-4 py-3">499</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="mb-4">
+                Die Vorhersage ist in 34,93 % der Fälle exakt korrekt. In
+                44,27 % der Fälle befindet sich das korrekte nächste Wort unter
+                den fünf wahrscheinlichsten Vorhersagen. Für k = 10, 20 und 100
+                steigen die Trefferquoten auf 48,68 %, 53,51 % beziehungsweise
+                65,83 %.
+            </p>
+
+            <p>
+                Die Perplexity beträgt 499. Bei einer Vokabulargröße von 30.709
+                Wörtern zeigt dies, dass das Modell die Unsicherheit gegenüber
+                einer zufälligen Vorhersage deutlich reduziert. Gleichzeitig ist
+                die Wahrscheinlichkeitsverteilung weiterhin relativ breit,
+                sodass das Modell häufig plausible Alternativen in Betracht
+                zieht.
+            </p>
+        </section>
+
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                3. Rekonstruktion der Trainingsdaten und Datenschutz
+            </h3>
+
+            <p class="mb-4">
+                Die Trainingsdaten konnten teilweise rekonstruiert werden.
+                Insbesondere bei häufig vorkommenden Satzanfängen oder
+                charakteristischen Formulierungen erzeugte das Modell
+                Wortfolgen, die den Trainingsdaten sehr ähnlich waren. Beispiele
+                hierfür traten sowohl bei Literaturtexten als auch bei
+                Fachtexten auf. Eine vollständige Rekonstruktion des Datensatzes
+                war jedoch nicht möglich.
+            </p>
+
+            <p>
+                Das Experiment zeigt, dass Language Models Trainingsdaten
+                teilweise speichern und reproduzieren können. Werden sensible
+                Daten wie personenbezogene Dokumente, E-Mails oder vertrauliche
+                Texte zum Training verwendet, kann daraus ein Datenschutzrisiko
+                entstehen. Deshalb sollten Trainingsdaten sorgfältig ausgewählt
+                und gegebenenfalls anonymisiert werden.
+            </p>
+        </section>
+
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                4. Diskussion
+            </h3>
+
+            <p class="mb-4">
+                Das LSTM-Modell konnte sinnvolle Wortvorhersagen erzeugen und
+                typische sprachliche Muster lernen. Die Qualität der Vorhersagen
+                hing stark von den verwendeten Trainingsdaten ab. Beim Training
+                auf einem einzelnen Fachbuch dominierten dessen Themen und
+                Formulierungen die generierten Texte. Durch die Kombination von
+                Literatur und Wikipedia-Artikeln wurden die Vorhersagen deutlich
+                allgemeiner.
+            </p>
+
+            <p>
+                Gleichzeitig zeigte sich, dass das Modell keine semantische
+                Bedeutung versteht, sondern statistische Zusammenhänge zwischen
+                Wörtern erlernt. Die Top-k-Auswertung verdeutlicht, dass das
+                korrekte nächste Wort häufig unter mehreren plausiblen
+                Vorschlägen enthalten ist, selbst wenn die beste Vorhersage
+                nicht exakt stimmt. Die Rekonstruktionsversuche zeigten
+                außerdem, dass ein trainiertes Modell Teile seiner
+                Trainingsdaten reproduzieren kann.
+            </p>
+        </section>
+
+        <section class="mb-10">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                5. Technische Dokumentation
+            </h3>
+
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>TensorFlow / Keras:</strong> Aufbau, Training und Speicherung des LSTM-Netzwerks.</li>
+                <li><strong>TensorFlow.js:</strong> Ausführung des trainierten Modells direkt im Browser und Umsetzung der interaktiven Wortvorhersage.</li>
+                <li><strong>JavaScript:</strong> Steuerung der Benutzerinteraktion, Tokenisierung der Eingabe, Anzeige der Vorhersagen und automatische Textgenerierung.</li>
+                <li><strong>HTML/CSS:</strong> Benutzeroberfläche mit Eingabefeld, Vorhersageanzeige und Steuerelementen.</li>
+            </ul>
+
+            <p class="mt-4">
+                Technische Besonderheiten der Lösung sind die Verwendung eines
+                autoregressiven Sprachmodells, die Umwandlung des trainierten
+                Keras-Modells nach TensorFlow.js sowie die browserseitige
+                Berechnung der Vorhersagen ohne Serverkomponente.
+            </p>
+        </section>
+
+        <section>
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                6. Fachliche Dokumentation
+            </h3>
+
+            <p class="mb-4">
+                Für das Language Model wurde ein autoregressiver Ansatz zur
+                Next-Word-Prediction verwendet. Aus jeweils drei
+                aufeinanderfolgenden Wörtern wird das folgende Wort
+                vorhergesagt. Die Wörter werden tokenisiert und über ein
+                Wörterbuch in numerische Indizes umgewandelt. Eine
+                Embedding-Schicht erzeugt dichte Wortvektoren, die anschließend
+                von zwei LSTM-Schichten verarbeitet werden. Die Ausgabe erfolgt
+                über eine Softmax-Schicht mit der Größe des gesamten
+                Vokabulars.
+            </p>
+
+            <p>
+                Trainiert wurde das Modell mit dem Adam-Optimizer und der
+                Categorical-Cross-Entropy-Loss-Funktion über 50 Epochen. Die
+                Trainings-Accuracy stieg dabei von etwa 3,8 % auf rund 67 %,
+                während der Loss kontinuierlich sank. Nach dem Training wurde
+                das Modell für die Verwendung in TensorFlow.js konvertiert und
+                in die Webanwendung integriert.
+            </p>
+        </section>
+    </div>
+</div>
 </div>
 
 <!-- Script erst ganz am Ende laden -->
 <script src="script.js?v=6"></script>
-```
 
 </body>
 </html>
